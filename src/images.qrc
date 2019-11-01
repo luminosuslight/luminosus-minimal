@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/bg/blueprint_grey_tiled.jpg</file>
+        <file>images/bg/blueprint_tiled.jpg</file>
+        <file>images/bg/gradient_grey.jpg</file>
+        <file>images/bg/polygon_grey.jpg</file>
+        <file>images/bg/solid_black.jpg</file>
+        <file>images/bg/solid_grey.jpg</file>
+        <file>images/svg/copy.svg</file>
+        <file>images/svg/down_arrow_slim.svg</file>
+        <file>images/svg/eye.svg</file>
+        <file>images/svg/eye_crossed.svg</file>
+        <file>images/svg/trash.svg</file>
+        <file>images/svg/undo.svg</file>
+        <file>images/svg/up_arrow_slim.svg</file>
+        <file>images/add_icon.png</file>
+        <file>images/gear_icon.png</file>
+        <file>images/save_icon.png</file>
+        <file>images/settings_slider_icon.png</file>
+        <file>images/plus_icon.png</file>
+        <file>images/combobox_arrows_blue.png</file>
+        <file>images/copy_icon.png</file>
+        <file>images/down_arrow_slim_blue.png</file>
+        <file>images/trash_icon.png</file>
+        <file>images/down_arrow_slim.png</file>
+    </qresource>
+</RCC>
