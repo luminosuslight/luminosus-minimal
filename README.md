@@ -11,4 +11,5 @@ The goal is that this compiles on all supported platforms desktop platforms with
 
 ## Build Instructions
 
+* `git submodule update --init --recursive`
 * open `src/luminosus-minimal.pro` in Qt Creator, configure and hit the green play button
