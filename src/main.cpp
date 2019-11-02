@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     Luminosus::prepareQmlEngine(engine);
     Luminosus::registerQtQuickItems();
 
-    CoreController controller(engine, QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    CoreController controller(engine, QUrl(QStringLiteral("qrc:/ui/main.qml")));
 
     Luminosus::preparePauseAndShutdown(app, engine, controller);
 

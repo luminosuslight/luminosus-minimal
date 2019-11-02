@@ -1,3 +1,6 @@
 [submodule "src/core"]
 	path = src/core
 	url = git@github.com:luminosuslight/luminosus-core.git
+[submodule "src/universal-blocks"]
+	path = src/universal-blocks
+	url = git@github.com:luminosuslight/luminosus-universal-blocks.git
