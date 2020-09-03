@@ -1,5 +1,5 @@
-#ifndef CLOCKBLOCK_H
-#define CLOCKBLOCK_H
+#ifndef ANSIBLEPROJECTBLOCK_H
+#define ANSIBLEPROJECTBLOCK_H
 
 #include "core/block_basics/BlockBase.h"
 
@@ -27,6 +27,14 @@ public:
 
 public slots:
     virtual BlockInfo getBlockInfo() const override { return info(); }
+
+    void updatePlaybooks();
+
+protected:
+    StringAttribute m_projectPath;
+
+    // runtime:
+    VariantListAttribute m_playbooks;
 };
 
-#endif // CLOCKBLOCK_H
+#endif // ANSIBLEPROJECTBLOCK_H
