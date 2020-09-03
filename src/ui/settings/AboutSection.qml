@@ -22,7 +22,6 @@ StretchColumn {
             width: parent.width / 2
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignRight
-            color: controller.updateManager().updateIsAvailable ? "red" : "#fff"
         }
     }
     BlockRow {
@@ -39,32 +38,6 @@ StretchColumn {
             horizontalAlignment: Text.AlignRight
             color: "#888"
         }
-    }
-    StretchText {
-        text: "No Update Available"
-        visible: !controller.updateManager().updateIsAvailable
-        hAlign: Text.AlignRight
-    }
-
-    BlockRow {
-        visible: controller.updateManager().updateIsAvailable
-        Text {
-            text: "Available:"
-            width: parent.width / 2
-            verticalAlignment: Text.AlignVCenter
-        }
-        Text {
-            text: controller.updateManager().newestStableVersionNumber
-            width: parent.width / 2
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignRight
-            color: "lightgreen"
-        }
-    }
-    ButtonBottomLine {
-        text: "Get Update"
-        onPress: Qt.openUrlExternally("http://www.luminosus.org/download")
-        visible: controller.updateManager().updateIsAvailable
     }
 
     BlockRow {

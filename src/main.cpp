@@ -24,14 +24,16 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     addFonts();
 
-    QQmlApplicationEngine engine;
+    QQmlApplicationEngine* engine = new QQmlApplicationEngine();
 
-    Luminosus::prepareQmlEngine(engine);
+    Luminosus::prepareQmlEngine(*engine);
     Luminosus::registerQtQuickItems();
 
-    CoreController controller(engine, QUrl(QStringLiteral("qrc:/ui/main.qml")));
+    CoreController controller(engine);
+    // load custom managers here...
+    controller.finishLoading(QUrl(QStringLiteral("qrc:/ui/main.qml")));
 
-    Luminosus::preparePauseAndShutdown(app, engine, controller);
+    Luminosus::preparePauseAndShutdown(app, *engine, controller);
 
     return app.exec();
 }

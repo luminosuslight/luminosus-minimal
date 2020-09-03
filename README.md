@@ -7,6 +7,8 @@ The goal is that this compiles on all supported platforms desktop platforms with
 
 * latest Qt release
 * Qt Creator or qmake
+* Ubuntu: `libgl-dev`
+* Generate OpenSSL certificate: `cd src/core/data && openssl req -x509 -newkey rsa:4096 -keyout luminosus_websocket.key -out luminosus_websocket.cert -days 3650 -sha256 -nodes && cd ../../..`
 * see luminosus-core for details
 
 ## Build Instructions
