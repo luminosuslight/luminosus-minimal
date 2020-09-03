@@ -1,6 +1,7 @@
 include(core/luminosus-core.pri)
 
 include(universal-blocks/universal-blocks.pri)
+include(ansible-blocks/ansible-blocks.pri)
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
