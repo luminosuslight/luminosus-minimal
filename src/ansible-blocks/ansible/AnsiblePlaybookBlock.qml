@@ -17,7 +17,7 @@ BlockBase {
         BlockRow {
             height: 30*dp
             implicitHeight: 0
-            leftMargin: 5*dp
+            leftMargin: 10*dp
 
             Item {
                 implicitWidth: -1
@@ -37,6 +37,7 @@ BlockBase {
                 implicitWidth: -1
                 TextInput {
                     anchors.fill: parent
+                    anchors.leftMargin: 10*dp
                     hintText: "Vault Secret"
                     text: block.attr("vaultSecret").val
                     onTextChanged: {
@@ -49,10 +50,11 @@ BlockBase {
             }
 
             ButtonBottomLine {
-                width: 60*dp
+                width: 70*dp
                 implicitWidth: 0
                 text: "Run >"
                 onPress: block.run()
+                color: "lightgreen"
             }
 
             ButtonBottomLine {
@@ -60,6 +62,7 @@ BlockBase {
                 implicitWidth: 0
                 text: "Stop"
                 onPress: block.stop()
+                color: "darkred"
             }
 
             HeightResizeArea {
@@ -78,12 +81,11 @@ BlockBase {
                 implicitWidth: -1
                 TextInput {
                     anchors.fill: parent
-                    anchors.rightMargin: 5*dp
-                    hintText: "Title Whitelist"
-                    text: block.attr("titleWhitelist").val
+                    hintText: "Search"
+                    text: block.attr("searchPhrase").val
                     onDisplayTextChanged: {
-                        if (displayText !== block.attr("titleWhitelist").val) {
-                            block.attr("titleWhitelist").val = displayText
+                        if (displayText !== block.attr("searchPhrase").val) {
+                            block.attr("searchPhrase").val = displayText
                         }
                     }
                 }
@@ -94,7 +96,7 @@ BlockBase {
                 implicitWidth: -1
                 TextInput {
                     anchors.fill: parent
-                    anchors.leftMargin: 5*dp
+                    anchors.leftMargin: 10*dp
                     hintText: "Title Blacklist"
                     text: block.attr("titleBlacklist").val
                     onDisplayTextChanged: {
@@ -117,6 +119,7 @@ BlockBase {
                 model: block.messagesModel()
                 verticalLayoutDirection: ListView.BottomToTop
                 clip: true
+                flickableDirection: Flickable.VerticalFlick
 
                 delegate: StretchColumn {
                     id: messageDelegate
@@ -142,7 +145,7 @@ BlockBase {
                                 width: 40*dp
                                 text: model.id
                                 font.family: "BPmono"
-                                color: "#555"
+                                color: "#777"
                                 horizontalAlignment: Text.AlignRight
                             }
                             Item {
@@ -177,14 +180,14 @@ BlockBase {
                         height: messageContent.contentHeight
                         visible: !collapsed
                         Rectangle {
-                            color: "#999"
+                            color: "#777"
                             width: 2*dp
                             height: parent.height - 6*dp
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.horizontalCenter: parent.left
                             anchors.horizontalCenterOffset: 65*dp
                         }
-                        Text {
+                        TextEdit {
                             id: messageContent
                             anchors.fill: parent
                             anchors.leftMargin: 80*dp
@@ -193,11 +196,13 @@ BlockBase {
                             font.pixelSize: 14*dp
                             font.family: "BPmono"
                             color: "#eee"
-                            enabled: false
-                            lineHeight: 1.5
+                            selectByMouse: true
+                            readOnly: true
+                            //lineHeight: 1.5
                             onTextChanged: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
                             onWidthChanged: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
                             Component.onCompleted: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
+
                         }
                     }
                 }  // end delegate
@@ -209,8 +214,9 @@ BlockBase {
                 width: 30*dp
                 height: 30*dp
                 anchors.right: parent.right
-                anchors.bottom: parent.top
-                text: "^"
+                anchors.top: parent.top
+                text: "▲"
+                color: "#888"
                 onPress: listView.positionViewAtEnd()
             }
 
@@ -219,7 +225,8 @@ BlockBase {
                 height: 30*dp
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                text: "v"
+                text: "▼"
+                color: "#888"
                 onPress: listView.positionViewAtBeginning()
             }
 
@@ -233,12 +240,29 @@ BlockBase {
         BlockRow {
             height: 30*dp
             implicitHeight: 0
+
+            StretchText {
+                text: block.attr("totalMessageCount").val + " messages"
+                color: "#ccc"
+                hAlign: Text.AlignHCenter
+            }
             Repeater {
-                model: [["total", "#ccc"], ["skipped", "grey"], ["ok", "lightgreen"], ["changed", "yellow"], ["warning", "orange"], ["fatal", "red"]]
-                StretchText {
-                    text: block.attr(modelData[0] + "MessageCount").val + " " + modelData[0]
-                    color: modelData[1]
-                    hAlign: Text.AlignHCenter
+                model: [["skipped", "grey"], ["ok", "lightgreen"], ["changed", "yellow"], ["warning", "orange"], ["failed", "red"]]
+                Item {
+                    implicitWidth: -1
+                    AttributeCheckbox {
+                        width: 30*dp
+                        height: 30*dp
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        attr: block.attr(modelData[0] + "MessagesEnabled")
+                    }
+                    StretchText {
+                        anchors.fill: parent
+                        text: block.attr(modelData[0] + "MessageCount").val + " " + modelData[0]
+                        color: modelData[1]
+                        hAlign: Text.AlignHCenter
+                    }
                 }
             }
         }

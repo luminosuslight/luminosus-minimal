@@ -19,18 +19,31 @@ AnsiblePlaybookBlock::AnsiblePlaybookBlock(CoreController* controller, QString u
     , m_filePath(this, "filePath", "")
     , m_hostsLimit(this, "hostsLimit", "")
     , m_vaultSecret(this, "vaultSecret", "", /*persistent*/ false)
-    , m_titleWhitelist(this, "titleWhitelist", "")
+    , m_searchPhrase(this, "searchPhrase", "")
     , m_titleBlacklist(this, "titleBlacklist", "")
-    , m_totalMessageCount(this, "totalMessageCount", 0, 0, std::numeric_limits<int>::max())
-    , m_skippedMessageCount(this, "skippedMessageCount", 0, 0, std::numeric_limits<int>::max())
-    , m_okMessageCount(this, "okMessageCount", 0, 0, std::numeric_limits<int>::max())
-    , m_changedMessageCount(this, "changedMessageCount", 0, 0, std::numeric_limits<int>::max())
-    , m_warningMessageCount(this, "warningMessageCount", 0, 0, std::numeric_limits<int>::max())
-    , m_fatalMessageCount(this, "fatalMessageCount", 0, 0, std::numeric_limits<int>::max())
+    , m_totalMessageCount(this, "totalMessageCount", 0, 0, std::numeric_limits<int>::max(), /*persistent*/ false)
+    , m_skippedMessageCount(this, "skippedMessageCount", 0, 0, std::numeric_limits<int>::max(), /*persistent*/ false)
+    , m_okMessageCount(this, "okMessageCount", 0, 0, std::numeric_limits<int>::max(), /*persistent*/ false)
+    , m_changedMessageCount(this, "changedMessageCount", 0, 0, std::numeric_limits<int>::max(), /*persistent*/ false)
+    , m_warningMessageCount(this, "warningMessageCount", 0, 0, std::numeric_limits<int>::max(), /*persistent*/ false)
+    , m_failedMessageCount(this, "failedMessageCount", 0, 0, std::numeric_limits<int>::max(), /*persistent*/ false)
+    , m_skippedMessagesEnabled(this, "skippedMessagesEnabled", true)
+    , m_okMessagesEnabled(this, "okMessagesEnabled", true)
+    , m_changedMessagesEnabled(this, "changedMessagesEnabled", true)
+    , m_warningMessagesEnabled(this, "warningMessagesEnabled", true)
+    , m_failedMessagesEnabled(this, "failedMessagesEnabled", true)
     , m_messages(this, "messages", {}, /*persistent*/ false)
 {
     m_widthIsResizable = true;
     m_heightIsResizable = true;
+
+    connect(&m_searchPhrase, &StringAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
+    connect(&m_titleBlacklist, &StringAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
+    connect(&m_skippedMessagesEnabled, &BoolAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
+    connect(&m_okMessagesEnabled, &BoolAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
+    connect(&m_changedMessagesEnabled, &BoolAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
+    connect(&m_warningMessagesEnabled, &BoolAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
+    connect(&m_failedMessagesEnabled, &BoolAttribute::valueChanged, this, &AnsiblePlaybookBlock::updateMessagesModel);
 
     qmlRegisterAnonymousType<QSListModel>("Luminosus", 1);
 
@@ -123,6 +136,7 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
                 }
                 item["content"] = currentContent.join("\n");
                 messages << item;
+                item.clear();
                 currentContent.clear();
             }
 
@@ -146,15 +160,18 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
             }
 
             currentContent << msg;
-
-            if (msg.contains("skipped:")) {
+            if (msg.contains("[WARNING]")) {
+                item["status"] = "warning";
+                item["color"] = QColor(255, 0, 255).lighter();
+                ++warningMessageCount;
+            } else if (msg.contains("skipped:") || msg.contains("skipping:")) {
                 item["status"] = "skipped";
                 ++skippedMessageCount;
             } else if (msg.contains("ok:")) {
                 item["status"] = "ok";
                 item["color"] = QColor(0, 255, 0).lighter();
                 ++okMessageCount;
-            } else if (msg.contains("fatal:") || item["content"].toString().contains("failed:")) {
+            } else if (msg.contains("fatal:") || msg.contains("failed:")) {
                 item["status"] = "failed";
                 item["color"] = QColor(255, 0, 0).lighter();
                 ++fatalMessageCount;
@@ -162,10 +179,6 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
                 item["status"] = "changed";
                 item["color"] = QColor(255, 255, 0).lighter();
                 ++changedMessageCount;
-            } else if (msg.contains("[WARNING]")) {
-                item["status"] = "warning";
-                item["color"] = QColor(255, 0, 255).lighter();
-                ++warningMessageCount;
             }
         }
     }
@@ -184,7 +197,7 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
     m_okMessageCount = okMessageCount;
     m_changedMessageCount = changedMessageCount;
     m_warningMessageCount = warningMessageCount;
-    m_fatalMessageCount = fatalMessageCount;
+    m_failedMessageCount = fatalMessageCount;
 
     updateMessagesModel();
 }
@@ -193,10 +206,21 @@ void AnsiblePlaybookBlock::updateMessagesModel() {
     QVariantList visibleMessages;
 
     for (const auto& msg: m_messages.getValue()) {
-        if (m_titleWhitelist.getValue().isEmpty()
-                || msg.toMap()["title"].toString().toLower().contains(m_titleWhitelist.getValue())) {
+        const QString status = msg.toMap()["status"].toString();
+        const QString title = msg.toMap()["title"].toString().toLower();
+        const QString content = msg.toMap()["content"].toString().toLower();
+
+        if (status == "skipped" && !m_skippedMessagesEnabled.getValue()) continue;
+        if (status == "ok" && !m_okMessagesEnabled.getValue()) continue;
+        if (status == "changed" && !m_changedMessagesEnabled.getValue()) continue;
+        if (status == "warning" && !m_warningMessagesEnabled.getValue()) continue;
+        if (status == "failed" && !m_failedMessagesEnabled.getValue()) continue;
+
+        if (m_searchPhrase.getValue().isEmpty()
+                || title.contains(m_searchPhrase.getValue())
+                || content.contains(m_searchPhrase.getValue())) {
             if (m_titleBlacklist.getValue().isEmpty()
-                    || !msg.toMap()["title"].toString().toLower().contains(m_titleBlacklist.getValue())) {
+                    || !title.contains(m_titleBlacklist.getValue())) {
                 visibleMessages.prepend(msg);
             }
         }

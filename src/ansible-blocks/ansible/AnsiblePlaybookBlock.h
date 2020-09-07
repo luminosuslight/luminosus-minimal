@@ -50,7 +50,7 @@ protected:
     StringAttribute m_hostsLimit;
     StringAttribute m_vaultSecret;
 
-    StringAttribute m_titleWhitelist;
+    StringAttribute m_searchPhrase;
     StringAttribute m_titleBlacklist;
 
     IntegerAttribute m_totalMessageCount;
@@ -58,7 +58,13 @@ protected:
     IntegerAttribute m_okMessageCount;
     IntegerAttribute m_changedMessageCount;
     IntegerAttribute m_warningMessageCount;
-    IntegerAttribute m_fatalMessageCount;
+    IntegerAttribute m_failedMessageCount;
+
+    BoolAttribute m_skippedMessagesEnabled;
+    BoolAttribute m_okMessagesEnabled;
+    BoolAttribute m_changedMessagesEnabled;
+    BoolAttribute m_warningMessagesEnabled;
+    BoolAttribute m_failedMessagesEnabled;
 
     QProcessEnvironment m_userEnvironment;
 
