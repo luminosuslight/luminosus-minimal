@@ -113,43 +113,96 @@ BlockBase {
             ListView {
                 id: listView
                 anchors.fill: parent
-                anchors.leftMargin: 10*dp
                 visible: count > 0
                 model: block.messagesModel()
                 verticalLayoutDirection: ListView.BottomToTop
                 clip: true
+
                 delegate: StretchColumn {
                     id: messageDelegate
                     width: listView.width
                     height: collapsed ? 30*dp : implicitHeight + 10*dp
-                    defaultSize: 30*dp
                     property bool collapsed: true
+                    defaultSize: 30*dp
 
-                    StretchText {
-                        text: title
-                        font.family: "BPmono"
-                        color: model.color || "#ccc"
-                        CustomTouchArea {
+//                    Behavior on height {
+//                        NumberAnimation {
+//                            duration: 300
+//                            easing.type: Easing.OutCurve
+//                        }
+//                    }
+
+                    CustomTouchArea {
+                        height: 30*dp
+                        onClick: messageDelegate.collapsed = !messageDelegate.collapsed
+
+                        StretchRow {
                             anchors.fill: parent
-                            onClick: messageDelegate.collapsed = !messageDelegate.collapsed
+                            Text {
+                                width: 40*dp
+                                text: model.id
+                                font.family: "BPmono"
+                                color: "#555"
+                                horizontalAlignment: Text.AlignRight
+                            }
+                            Item {
+                                width: 10*dp
+                            }
+                            Item {
+                                width: 30*dp
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    width: 5*dp
+                                    height: width
+                                    radius: width / 2
+                                    antialiasing: false
+                                    color: model.color || "#ccc"
+                                }
+                            }
+                            Text {
+                                width: 70*dp
+                                text: model.type || ""
+                                font.family: "BPmono"
+                                color: model.color || "#ccc"
+                            }
+                            StretchText {
+                                text: model.title || ""
+                                font.family: "BPmono"
+                                color: model.color || "#ccc"
+                            }
                         }
                     }
 
-                    Text {
+                    Item {
+                        height: messageContent.contentHeight
                         visible: !collapsed
-                        wrapMode: Text.Wrap
-                        text: model.content
-                        font.pixelSize: 14*dp
-                        font.family: "BPmono"
-                        color: "#eee"
-                        enabled: false
-                        lineHeight: 1.5
-                        onTextChanged: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
-                        onWidthChanged: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
-                        Component.onCompleted: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
+                        Rectangle {
+                            color: "#999"
+                            width: 2*dp
+                            height: parent.height - 6*dp
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.left
+                            anchors.horizontalCenterOffset: 65*dp
+                        }
+                        Text {
+                            id: messageContent
+                            anchors.fill: parent
+                            anchors.leftMargin: 80*dp
+                            wrapMode: Text.Wrap
+                            text: model.content
+                            font.pixelSize: 14*dp
+                            font.family: "BPmono"
+                            color: "#eee"
+                            enabled: false
+                            lineHeight: 1.5
+                            onTextChanged: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
+                            onWidthChanged: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
+                            Component.onCompleted: guiManager.setPropertyWithoutChangingBindings(this, "height", contentHeight)
+                        }
                     }
                 }  // end delegate
-                Component.onCompleted: positionViewAtEnd()
+
+                Component.onCompleted: positionViewAtBeginning()
             }
 
             ButtonSideLine {
@@ -158,7 +211,7 @@ BlockBase {
                 anchors.right: parent.right
                 anchors.bottom: parent.top
                 text: "^"
-                onPress: listView.positionViewAtBeginning()
+                onPress: listView.positionViewAtEnd()
             }
 
             ButtonSideLine {
@@ -167,7 +220,7 @@ BlockBase {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 text: "v"
-                onPress: listView.positionViewAtEnd()
+                onPress: listView.positionViewAtBeginning()
             }
 
             Text {

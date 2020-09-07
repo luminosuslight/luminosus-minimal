@@ -36,7 +36,7 @@ AnsiblePlaybookBlock::AnsiblePlaybookBlock(CoreController* controller, QString u
 
     // prevent QML engine from taking ownership and deleting this object:
     m_messagesModel.setParent(this);
-    m_messagesModel.setRoleNames({"id", "title", "content", "channel", "color"});
+    m_messagesModel.setRoleNames({"id", "type", "title", "content", "status", "color"});
 
     retrieveUserEnvironment();
 }
@@ -99,12 +99,9 @@ void AnsiblePlaybookBlock::stop() {
 void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
     QVariantList messages;
 
-    QString currentTitle = "";
-    QStringList currentContent = {};
-
     QRegularExpression jsonRegex("({.*})", QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression titleRegex("([A-Z]+) \\[(.*)\\] ");
 
-    int index = 0;
     int totalMessageCount = 0;
     int skippedMessageCount = 0;
     int okMessageCount = 0;
@@ -112,38 +109,33 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
     int warningMessageCount = 0;
     int fatalMessageCount = 0;
 
+    QVariantMap item;
+    QStringList currentContent = {};
+
     for (QString msg: m_rawProgrammOutput.split("\n")) {
         if (msg.isEmpty()) continue;
 
         if (msg.startsWith("PLAY ") || msg.startsWith("TASK ") || msg.startsWith("Ansible Exit Code:")) {
-            if (!currentTitle.isEmpty() || !currentContent.isEmpty()) {
+            if (!item.isEmpty()) {
                 // submit previous item:
-                QVariantMap item;
-                item["id"] = index;
-                item["title"] = currentTitle.isEmpty() ? "Message" : currentTitle;
-                item["content"] = currentContent.join("\n");
-                item["channel"] = "standard_output";
-                if (item["content"].toString().contains("skipped:")) {
-                    ++skippedMessageCount;
-                } else if (item["content"].toString().contains("ok:")) {
-                    item["color"] = QColor(0, 255, 0).lighter();
-                    ++okMessageCount;
-                } else if (item["content"].toString().contains("fatal:") || item["content"].toString().contains("failed:")) {
-                    item["color"] = QColor(255, 0, 0).lighter();
-                    ++fatalMessageCount;
-                } else if (item["content"].toString().contains("changed:")) {
-                    item["color"] = QColor(255, 255, 0).lighter();
-                    ++changedMessageCount;
-                } else if (item["content"].toString().contains("[WARNING]")) {
-                    item["color"] = QColor(255, 0, 255).lighter();
-                    ++warningMessageCount;
+                if (!item.contains("status")) {
+                    item["status"] = "unknown";
                 }
+                item["content"] = currentContent.join("\n");
                 messages << item;
-                ++index;
-                ++totalMessageCount;
+                currentContent.clear();
             }
-            currentTitle = msg;
-            currentContent.clear();
+
+            item["id"] = totalMessageCount;
+            ++totalMessageCount;
+            auto titleMatch = titleRegex.match(msg);
+            if (titleMatch.hasMatch()) {
+                item["type"] = titleMatch.captured(1);
+                item["title"] = titleMatch.captured(2);
+            } else {
+                item["type"] = "";
+                item["title"] = msg;
+            }
         } else {
             QRegularExpressionMatch match = jsonRegex.match(msg);
             if (match.hasMatch()) {
@@ -152,20 +144,37 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
                 QString jsonString = doc.toJson(QJsonDocument::Indented);
                 msg.replace(json, jsonString);
             }
+
             currentContent << msg;
+
+            if (msg.contains("skipped:")) {
+                item["status"] = "skipped";
+                ++skippedMessageCount;
+            } else if (msg.contains("ok:")) {
+                item["status"] = "ok";
+                item["color"] = QColor(0, 255, 0).lighter();
+                ++okMessageCount;
+            } else if (msg.contains("fatal:") || item["content"].toString().contains("failed:")) {
+                item["status"] = "failed";
+                item["color"] = QColor(255, 0, 0).lighter();
+                ++fatalMessageCount;
+            } else if (msg.contains("changed:")) {
+                item["status"] = "changed";
+                item["color"] = QColor(255, 255, 0).lighter();
+                ++changedMessageCount;
+            } else if (msg.contains("[WARNING]")) {
+                item["status"] = "warning";
+                item["color"] = QColor(255, 0, 255).lighter();
+                ++warningMessageCount;
+            }
         }
     }
 
-    if (!currentTitle.isEmpty() || !currentContent.isEmpty()) {
+    if (!item.isEmpty()) {
         // submit last item:
-        QVariantMap item;
-        item["id"] = index;
-        item["title"] = currentTitle;
         item["content"] = currentContent.join("\n");
-        item["channel"] = "standard_output";
         messages << item;
-        ++index;
-        ++totalMessageCount;
+        currentContent.clear();
     }
 
     m_messages = messages;
