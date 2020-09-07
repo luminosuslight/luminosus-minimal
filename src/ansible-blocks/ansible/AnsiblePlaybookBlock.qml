@@ -6,7 +6,7 @@ import "qrc:/core/ui/controls"
 
 BlockBase {
     id: root
-    width: 600*dp
+    width: 900*dp
     height: 400*dp
     onWidthChanged: block.positionChanged()
 
@@ -169,7 +169,7 @@ BlockBase {
                                 color: model.color || "#ccc"
                             }
                             StretchText {
-                                text: model.title || ""
+                                text: model.title || "Unknown Message"
                                 font.family: "BPmono"
                                 color: model.color || "#ccc"
                             }

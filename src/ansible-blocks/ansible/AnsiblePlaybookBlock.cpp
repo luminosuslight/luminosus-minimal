@@ -1,6 +1,7 @@
 #include "AnsiblePlaybookBlock.h"
 
 #include "core/manager/BlockList.h"
+#include "core/manager/FileSystemManager.h"
 
 #include <qsyncable/QSDiffRunner>
 
@@ -57,7 +58,8 @@ AnsiblePlaybookBlock::AnsiblePlaybookBlock(CoreController* controller, QString u
 void AnsiblePlaybookBlock::run() {
     if (m_filePath.getValue().isEmpty()) return;
 
-    QStringList arguments {m_filePath};
+    QString path = m_controller->dao()->withoutFilePrefix(m_filePath);
+    QStringList arguments {path};
     if (!m_hostsLimit.getValue().isEmpty()) {
         arguments << "--limit";
         arguments << m_hostsLimit.getValue();
@@ -72,7 +74,7 @@ void AnsiblePlaybookBlock::run() {
 #ifdef Q_OS_LINUX
     QProcess* process = new QProcess(this);
     process->setProcessEnvironment(m_userEnvironment);
-    process->setWorkingDirectory(QFileInfo(m_filePath).absoluteDir().path());
+    process->setWorkingDirectory(QFileInfo(path).absoluteDir().path());
     process->setProgram("ansible-playbook");
     process->setArguments(arguments);
 

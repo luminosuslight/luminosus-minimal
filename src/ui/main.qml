@@ -428,7 +428,10 @@ Window {
                     } else if (url.indexOf(".pdf") !== -1 || url.indexOf(".PDF") !== -1) {
                         block = controller.blockManager().addBlockByNameQml("PDF File")
                         block.attr("filePath").val = url
-                   } else {
+                    } else if (url.indexOf(".yml") !== -1 || url.indexOf(".yaml") !== -1) {
+                        block = controller.blockManager().addBlockByNameQml("Ansible Playbook")
+                        block.attr("filePath").val = url
+                    } else {
                         block = controller.blockManager().addBlockByNameQml("Notes")
                         block.text = url
                     }
@@ -446,6 +449,9 @@ Window {
                 } else if (url.indexOf(".pdf") !== -1 || url.indexOf(".PDF") !== -1) {
                      block = controller.blockManager().addBlockByNameQml("PDF File")
                      block.attr("filePath").val = url
+                } else if (url.indexOf(".yml") !== -1 || url.indexOf(".yaml") !== -1) {
+                    block = controller.blockManager().addBlockByNameQml("Ansible Playbook")
+                    block.attr("filePath").val = url
                 } else {
                     block = controller.blockManager().addBlockByNameQml("Notes")
                     block.text = url
