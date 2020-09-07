@@ -4,3 +4,6 @@
 [submodule "src/universal-blocks"]
 	path = src/universal-blocks
 	url = git@github.com:luminosuslight/luminosus-universal-blocks.git
+[submodule "src/qsyncable"]
+	path = src/qsyncable
+	url = git@github.com:benlau/qsyncable.git

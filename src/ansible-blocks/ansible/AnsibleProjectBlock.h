@@ -30,6 +30,8 @@ public slots:
 
     void updatePlaybooks();
 
+    void createPlaybookBlock(QString path, QString label);
+
 protected:
     StringAttribute m_projectPath;
 

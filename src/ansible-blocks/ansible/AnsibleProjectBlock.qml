@@ -31,7 +31,7 @@ BlockBase {
                     width: 30*dp
                     implicitWidth: 0
                     text: ">"
-                    //onPress: block.loadImage(index)
+                    onPress: block.createPlaybookBlock(modelData.path, modelData.name)
                 }
             }
         }

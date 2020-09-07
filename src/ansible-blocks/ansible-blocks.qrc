@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/ansible-blocks">
         <file>ansible/AnsibleProjectBlock.qml</file>
+        <file>ansible/AnsiblePlaybookBlock.qml</file>
     </qresource>
 </RCC>

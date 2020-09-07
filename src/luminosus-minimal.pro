@@ -1,5 +1,7 @@
 include(core/luminosus-core.pri)
 
+include(qsyncable/qsyncable.pri)
+
 include(universal-blocks/universal-blocks.pri)
 include(ansible-blocks/ansible-blocks.pri)
 

@@ -1,6 +1,10 @@
 #include "AnsibleProjectBlock.h"
 
+#include "core/CoreController.h"
 #include "core/manager/BlockList.h"
+#include "core/manager/BlockManager.h"
+
+#include "ansible-blocks/ansible/AnsiblePlaybookBlock.h"
 
 #include <QDir>
 
@@ -42,4 +46,16 @@ void AnsibleProjectBlock::updatePlaybooks() {
     });
 
     m_playbooks = items;
+}
+
+void AnsibleProjectBlock::createPlaybookBlock(QString path, QString label) {
+    auto* block = m_controller->blockManager()->addNewBlock<AnsiblePlaybookBlock>();
+    if (!block) {
+        qWarning() << "Could not create AnsiblePlaybookBlock.";
+        return;
+    }
+    block->focus();
+    block->attribute<StringAttribute>("filePath")->setValue(path);
+    block->attribute<StringAttribute>("label")->setValue(label);
+    block->onCreatedByUser();
 }
