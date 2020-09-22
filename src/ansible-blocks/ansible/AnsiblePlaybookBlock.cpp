@@ -162,7 +162,9 @@ void AnsiblePlaybookBlock::buildMessagesFromProgrammOutput() {
             }
 
             currentContent << msg;
-            if (msg.contains("[WARNING]")) {
+            if (item.contains("status") && item["status"] == "warning") {
+                // message contains warning, leave it at this status
+            } else if (msg.contains("[WARNING]")) {
                 item["status"] = "warning";
                 item["color"] = QColor(255, 0, 255).lighter();
                 ++warningMessageCount;
