@@ -5,7 +5,7 @@ The goal is that this compiles on all supported platforms desktop platforms with
 
 ## Requirements
 
-* latest Qt release
+* latest Qt release (originally created with 5.11 but now updated to at least compile with Qt 6.9)
 * Qt Creator or qmake
 * Ubuntu: `libgl-dev`
 * Generate OpenSSL certificate: `cd src/core/data && openssl req -x509 -newkey rsa:4096 -keyout luminosus_websocket.key -out luminosus_websocket.cert -days 3650 -sha256 -nodes && cd ../../..`
