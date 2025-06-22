@@ -44,3 +44,6 @@ build-*
 # Certificates
 *.cert
 *.key
+
+src/build/
+
