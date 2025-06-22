@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
-import QtQuick.Dialogs 1.2
-import QtGraphicalEffects 1.0
+import QtQuick.Dialogs
+import Qt5Compat.GraphicalEffects
 import CustomGeometry 1.0
 import CustomElements 1.0
 import "qrc:/ui/app"
@@ -356,10 +356,10 @@ Window {
 
     // -------------------------------- Template Import Dialog ---------------------------------
 
-    Dialog {
+    MessageDialog {
         id: templateImportDialog
         title: "Import Template"
-        standardButtons: Dialog.Open | Dialog.Cancel
+        buttons: Dialog.Open | Dialog.Cancel
         visible: controller.templateFileToImport
 
         onAccepted: {

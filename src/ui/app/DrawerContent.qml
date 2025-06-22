@@ -1,6 +1,6 @@
 import QtQuick 2.5
-import QtQuick.Controls 1.4
-import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Window 2.2
 import CustomElements 1.0
 
@@ -53,39 +53,19 @@ Item {
         }
     }
 
-	TabView {
+	StackLayout {
 		id: tabView
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: tabs.bottom
-		tabsVisible: false
-        style: TabViewStyle {
-                     frame: Item { }
-                     tab: Item {}
-                 }
+		//tabsVisible: false
         currentIndex: 0
 
-		Tab {
-			id: blocksTab
-			title: "Blocks"
-			BlockListDrawerContent {}
-		}
-		Tab {
-			id: blockSettingsTab
-			title: "Block Settings"
-			BlockSettingsDrawerContent {}
-		}
-		Tab {
-			id: projectsTab
-			title: "Projects"
-			ProjectsDrawerContent {}
-		}
-		Tab {
-			id: settingsTab
-			title: "Settings"
-			SettingsDrawerContent {}
-		}
+		BlockListDrawerContent {}
+		BlockSettingsDrawerContent {}
+		ProjectsDrawerContent {}
+		SettingsDrawerContent {}
     }
 
     Connections {
