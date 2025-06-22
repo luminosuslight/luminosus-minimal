@@ -1,7 +1,7 @@
 #include "core/helpers/application_setup.h"
 #include "core/CoreController.h"
 
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
 void addFonts() {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
     Luminosus::preQApplicationCreation();
 
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
     addFonts();
 
     QQmlApplicationEngine* engine = new QQmlApplicationEngine();
